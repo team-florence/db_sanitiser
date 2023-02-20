@@ -7,7 +7,7 @@ module DbSanitiser
         set_mysql_options(skip_unique_key_checks, skip_foreign_key_checks)
         without_indexes(table_name, indexes_to_drop_and_create) do
           update_values = columns_to_sanitise.to_a.map do |(key, value)|
-            "`#{key}` = #{value}"
+            "#{key} = #{value}"
           end
           scope = active_record_class(table_name)
           scope = scope.where(where_query) if where_query
