@@ -11,7 +11,7 @@ module DbSanitiser
           end
           scope = active_record_class(table_name)
           scope = scope.where(where_query) if where_query
-          scope.update_all(update_values.join(', '))
+          scope.in_batches.update_all(update_values.join(', '))
         end
       ensure
         reset_mysql_options
