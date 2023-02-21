@@ -11,7 +11,7 @@ module DbSanitiser
           end
           scope = active_record_class(table_name)
           scope = scope.where(where_query) if where_query
-          scope.in_batches.update_all(update_values.join(', '))
+          scope.in_batches(of: 10_000).update_all(update_values.join(', '))
         end
       ensure
         reset_mysql_options
@@ -22,7 +22,7 @@ module DbSanitiser
       end
 
       def delete_all(table_name)
-        active_record_class(table_name).delete_all
+        active_record_class(table_name).in_batches(of: 10_000).delete_all
       end
 
       def partially_delete(table_name, where_query, allowed_columns)
