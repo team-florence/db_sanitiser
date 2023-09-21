@@ -11,12 +11,19 @@ raise "By default DbSanitiser should not be enabled" if DbSanitiser.enabled?
 include ActiveRecord::Tasks
 
 DB_DIR = Pathname.new(__FILE__).dirname.expand_path.join('db')
-DB_CONFIG = YAML.load_file(DB_DIR.join('config.yml').to_s)
+
+if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1')
+  yaml_opts = { aliases: true }
+else
+  yaml_opts = {}
+end
+
+DB_CONFIG = YAML.load_file(DB_DIR.join('config.yml').to_s, **yaml_opts)
 
 ActiveRecord::Base.configurations = DB_CONFIG
 DatabaseTasks.database_configuration = DB_CONFIG
 DatabaseTasks.db_dir = DB_DIR.to_s
-DatabaseTasks.env = 'test'
+DatabaseTasks.env = ENV['CI'] ? 'ci' : 'test'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
